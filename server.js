@@ -1,22 +1,22 @@
-require("dotenv").config()
+require("dotenv").config();
 const express = require("express");
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
+const cors = require("cors");
 const authRoutes = require("./routes/auth");
 const connectToDatabase = require("./database/db");
+
 const app = express();
 
+// ✅ CORS FIRST
+app.use(cors());
 
-// Middleware
+// ✅ Body parser
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Routes
+// ✅ Routes
 app.use("/api/auth", authRoutes);
 
 // Connect MongoDB
-
-connectToDatabase()
+connectToDatabase();
 
 // Start server
 const PORT = process.env.PORT || 5000;
