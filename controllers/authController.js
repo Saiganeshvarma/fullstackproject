@@ -1,55 +1,71 @@
-const User = require("../models/User")
-const bcrypt = require("bcryptjs");
-const { uploadToCloudinary } = require("../helpers/cloudinaryHelper");
-const fs = require("fs");
+var User = require("../models/User")
+var bcyrpt = require("bcryptjs")
+var jwt = require("jsonwebtoken")
 
-const registerUser = async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
+var {uploadToCloudinary }= require("../helpers/cloudinaryHelper")
 
-    // Check if all fields are provided
-    if (!name || !email || !password || !req.file) {
-      return res.status(400).json({ message: "All fields are required" });
+
+
+var registerController = async(req,res)=>{
+  try{
+    var {name,email,password} = req.body
+    if(!name || !email || !password){
+      return res.status(200).json({message : "feilds are missing"})
     }
 
-    // Check if user exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+    var userExists = await User.findOne({email}) 
+    if(userExists){
+      return res.status(200).json({message : "user already exists"})
     }
+    var {url,publicId} = await uploadToCloudinary(req.file.path)
+    var salt = await bcyrpt.genSalt(10)
+    var hasedPassword = await bcyrpt.hash(password,salt)
+    var newUser = await User.create({
+      name ,
+      email ,
+      password : hasedPassword,
+      profilePic : {
+        url ,
+        publicId 
+      }
 
-    // Upload image to Cloudinary
-    const { url, publicId } = await uploadToCloudinary(req.file.path);
+    })
+    return res.status(201).json({newUser})
 
-    // Remove file from server after upload
-    fs.unlinkSync(req.file.path);
 
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Create user
-    const newUser = new User({
-      name,
-      email,
-      password: hashedPassword,
-      profilePic: { url, publicId },
-    });
-
-    await newUser.save();
-
-    res.status(201).json({
-      message: "User registered successfully",
-      user: {
-        name: newUser.name,
-        email: newUser.email,
-        profilePic: newUser.profilePic.url,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
+  }catch(error){
+    console.log("error",error);
   }
-};
+}
 
-module.exports = { registerUser };
+var loginController = async(req,res)=>{
+  try{
+    var {email,password} = req.body
+    var userExists = await User.findOne({email})
+    if(!userExists){
+      return res.status(200).json({message : "no account found register"})
+    }
+    var isPassword = await bcyrpt.compare(password,userExists.password)
+    if(!isPassword){
+      return res.status(200).json({message : "invalid password"})
+    }
+
+    var token = jwt.sign({
+      id : userExists._id 
+    },process.env.JWT_TOKEN ,{expiresIn : "1d"})
+
+
+    res.status(200).json({message : "login sucessfull",webToken : token})
+
+
+
+
+  }catch(error){
+    console.log("error");
+  }
+}
+
+
+module.exports = {
+  registerController,loginController
+}

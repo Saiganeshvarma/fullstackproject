@@ -1,8 +1,14 @@
-const express = require("express");
-const router = express.Router();
-const upload = require("../middleware/upload");
-const { registerUser } = require("../controllers/authController");
+var express = require("express")
 
-router.post("/register", upload.single("profilePic"), registerUser);
+var router = express.Router()
 
-module.exports = router;
+var upload = require("../middleware/upload")
+var {registerController,loginController} = require("../controllers/authController")
+
+router.post("/register",upload.single("profilePic"),registerController)
+
+router.post("/login",loginController)
+
+
+
+module.exports = router 

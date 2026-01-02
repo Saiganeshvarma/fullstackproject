@@ -1,20 +1,23 @@
-const cloudinary = require("../config/cloudinary");
+var cloudinary = require("../config/cloudinary")
 
-const uploadToCloudinary = async (filePath) => {
-  try {
-    const result = await cloudinary.uploader.upload(filePath, {
-      folder: "uploads",
-      resource_type: "image",
-    });
 
+var uploadToCloudinary = async(filepath)=>{
+  try{
+    var result = await cloudinary.uploader.upload(filepath,{
+      folder : "uploads",
+      resource_type : "image"
+    })
     return {
-      url: result.secure_url,
-      publicId: result.public_id,
-    };
-  } catch (error) {
-    console.error("Cloudinary Upload Error:", error);
-    throw error;
-  }
-};
+      url : result.secure_url,
+      publicId : result.public_id
 
-module.exports = { uploadToCloudinary };
+    }
+
+  }catch(error){
+    console.log("error",error);
+  }
+}
+
+module.exports = {
+  uploadToCloudinary
+}
