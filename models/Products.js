@@ -1,10 +1,10 @@
 var mongoose = require("mongoose")
 
 
-var productsSchema = new mongoose.Schema({
+var productShcema = new mongoose.Schema({
     title : {
         type : String,
-        required : true
+        required :true 
     },
     description : {
         type : String,
@@ -17,14 +17,14 @@ var productsSchema = new mongoose.Schema({
     image : {
         url : {
             type : String,
-            required : true 
+            required : true
         },
         publicId : {
             type : String,
-            required : true 
+            required : true
+
         }
     }
-
 })
 
-module.exports = mongoose.model("product",productsSchema)
+module.exports = mongoose.model("product",productShcema)

@@ -2,13 +2,20 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const authRoutes = require("./routes/auth");
-var productRoutes = require("./routes/productRoutes")
+const productRoutes = require("./routes/productRoutes")
+
 const connectToDatabase = require("./database/db");
 
 const app = express();
 
 // ✅ CORS FIRST
-app.use(cors());
+
+app.use(cors({
+  origin: "http://localhost:5173",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}))
+
 
 // ✅ Body parser
 app.use(express.json());
@@ -17,6 +24,8 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 
 app.use("/api/products",productRoutes)
+
+
 
 // Connect MongoDB
 connectToDatabase();
